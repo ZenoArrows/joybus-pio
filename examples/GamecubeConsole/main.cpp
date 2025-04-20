@@ -1,6 +1,7 @@
 #include "GamecubeConsole.hpp"
 #include "gamecube_definitions.h"
 
+#include <hardware/clocks.h>
 #include <hardware/pio.h>
 #include <pico/stdlib.h>
 

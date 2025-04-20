@@ -1,6 +1,7 @@
 #include "N64Console.hpp"
 #include "n64_definitions.h"
 
+#include <hardware/clocks.h>
 #include <hardware/pio.h>
 #include <pico/stdlib.h>
 
