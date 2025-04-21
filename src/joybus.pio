@@ -8,6 +8,7 @@
 ; Autopush with 8 bit ISR threshold
 public read:
     set pindirs 0                   ; Set pin to input
+    wait 1 pin 0                    ; Make sure the line is high before entering the loop
 read_loop:
     wait 0 pin 0 [T1 + T2 / 2 - 1]  ; Wait for falling edge, then wait until halfway through the 2uS which represents the bit value
     in pins, 1                      ; Read bit value
