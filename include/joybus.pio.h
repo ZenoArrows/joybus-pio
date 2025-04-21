@@ -13,7 +13,7 @@
 // ------ //
 
 #define joybus_wrap_target 0
-#define joybus_wrap 23
+#define joybus_wrap 26
 #define joybus_pio_version 1
 
 #define joybus_T1 10
@@ -21,41 +21,44 @@
 #define joybus_T3 10
 
 #define joybus_offset_read 0u
-#define joybus_offset_write 6u
+#define joybus_offset_write 9u
 
 static const uint16_t joybus_program_instructions[] = {
             //     .wrap_target
     0xe080, //  0: set    pindirs, 0
     0x20a0, //  1: wait   1 pin, 0
     0x3320, //  2: wait   0 pin, 0               [19]
-    0x4001, //  3: in     pins, 1
-    0x20a0, //  4: wait   1 pin, 0
-    0x0002, //  5: jmp    2
-    0xe081, //  6: set    pindirs, 1
-    0xe001, //  7: set    pins, 1
-    0x80e0, //  8: pull   ifempty block
-    0x6021, //  9: out    x, 1
-    0x00ef, // 10: jmp    !osre, 15
-    0x00b4, // 11: jmp    x != y, 20
-    0x80e0, // 12: pull   ifempty block
-    0x6021, // 13: out    x, 1
-    0x0010, // 14: jmp    16
-    0xa342, // 15: nop                           [3]
-    0xa142, // 16: nop                           [1]
-    0xe900, // 17: set    pins, 0                [9]
-    0xb201, // 18: mov    pins, x                [18]
-    0x0007, // 19: jmp    7
-    0xa442, // 20: nop                           [4]
-    0xe900, // 21: set    pins, 0                [9]
-    0xf201, // 22: set    pins, 1                [18]
-    0x0000, // 23: jmp    0
+    0xab20, //  3: mov    x, pins                [11]
+    0x00c7, //  4: jmp    pin, 7
+    0x20a0, //  5: wait   1 pin, 0
+    0x0002, //  6: jmp    2
+    0x4021, //  7: in     x, 1
+    0x0002, //  8: jmp    2
+    0xe081, //  9: set    pindirs, 1
+    0xe001, // 10: set    pins, 1
+    0x80e0, // 11: pull   ifempty block
+    0x6021, // 12: out    x, 1
+    0x00f2, // 13: jmp    !osre, 18
+    0x00b7, // 14: jmp    x != y, 23
+    0x80e0, // 15: pull   ifempty block
+    0x6021, // 16: out    x, 1
+    0x0013, // 17: jmp    19
+    0xa342, // 18: nop                           [3]
+    0xa142, // 19: nop                           [1]
+    0xe900, // 20: set    pins, 0                [9]
+    0xb201, // 21: mov    pins, x                [18]
+    0x000a, // 22: jmp    10
+    0xa442, // 23: nop                           [4]
+    0xe900, // 24: set    pins, 0                [9]
+    0xf201, // 25: set    pins, 1                [18]
+    0x0000, // 26: jmp    0
             //     .wrap
 };
 
 #if !PICO_NO_HARDWARE
 static const struct pio_program joybus_program = {
     .instructions = joybus_program_instructions,
-    .length = 24,
+    .length = 27,
     .origin = -1,
     .pio_version = joybus_pio_version,
 #if PICO_PIO_VERSION > 0
@@ -76,6 +79,7 @@ static inline pio_sm_config joybus_program_get_config(PIO pio, uint sm, uint off
     sm_config_set_out_pins(&c, pin, 1);
     sm_config_set_set_pins(&c, pin, 1);
     sm_config_set_in_pins(&c, pin);
+    sm_config_set_jmp_pin(&c, pin);
     // Shift to left, no autopull, 9 bit
     sm_config_set_out_shift(&c, false, false, 9);
     // Shift to left, autopush, 8 bit

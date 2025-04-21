@@ -11,8 +11,12 @@ public read:
     wait 1 pin 0                    ; Make sure the line is high before entering the loop
 read_loop:
     wait 0 pin 0 [T1 + T2 / 2 - 1]  ; Wait for falling edge, then wait until halfway through the 2uS which represents the bit value
-    in pins, 1                      ; Read bit value
-    wait 1 pin 0                    ; Done reading, so make sure we wait for the line to go high again before restarting the loop
+    mov x, pins [T2 / 2 + 1]        ; Read bit value, then wait until the expected rising edge
+    jmp pin read_push               ; Push the bit value and continue the loop if there was a rising edge
+    wait 1 pin 0                    ; Console turned off, so make sure we wait for the line to go high again before continuing the loop
+    jmp read_loop
+read_push:
+    in x, 1                         ; Push bit value
     jmp read_loop
 
 
@@ -52,6 +56,7 @@ static inline pio_sm_config joybus_program_get_config(PIO pio, uint sm, uint off
     sm_config_set_out_pins(&c, pin, 1);
     sm_config_set_set_pins(&c, pin, 1);
     sm_config_set_in_pins(&c, pin);
+    sm_config_set_jmp_pin(&c, pin);
     // Shift to left, no autopull, 9 bit
     sm_config_set_out_shift(&c, false, false, 9);
     // Shift to left, autopush, 8 bit
