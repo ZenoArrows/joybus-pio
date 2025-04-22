@@ -12,8 +12,8 @@ public read:
 read_loop:
     wait 0 pin 0 [T1 + T2 / 2 - 1]  ; Wait for falling edge, then wait until halfway through the 2uS which represents the bit value
     in pins, 1 [T2 / 2 + T3 / 2]    ; Read bit value, then wait until halfway through the expected rising edge
-    jmp pin read_loop               ; Push the bit value and continue the loop if there was a rising edge
-    mov isr, null                   ; Line was pulled low, thus we should empty the input shift register
+    jmp pin read_loop               ; Continue the loop if there was a rising edge, if not then restart the loop
+    mov isr, null                   ; Line was pulled low, thus we should restart the loop by emptying the input shift register
     wait 1 pin 0                    ; Make sure we wait for the line to go high again before restarting the loop
     jmp read_loop
 
